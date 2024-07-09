@@ -287,7 +287,7 @@ const email = document.getElementById('email').value
 const password = document.getElementById('password').value
 createUserWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
-    console.log(userCredential)
+    // console.log(userCredential)
   })
   .catch((error) => {
     console.error(error.message)
@@ -299,7 +299,7 @@ const signInEmailPass = () => {
     const password = document.getElementById('password-sign-in').value
     signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-        console.log(userCredential)
+        // console.log(userCredential)
     })
     .catch((error) => {
         console.error(error.message)
@@ -310,7 +310,7 @@ const resetPassword = () => {
     const email = document.getElementById('email-reset-pass').value
     sendPasswordResetEmail(auth, email)
   .then((user) => {
-    console.log(user)
+    // console.log(user)
   })
   .catch((error) => {
     console.error(error.message)
