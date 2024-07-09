@@ -21,8 +21,8 @@ const renderSignIn = () => {
                 <input type="password"
                         placeholder="Password"
                         id="password-sign-in"/>
-                <button id="btn-sign-in">Continue</button>
-                <button id="btn-google"><i class="fa-brands fa-google"></i> Continue with Google</button>
+                <button id="btn-sign-in" type="button">Continue</button>
+                <button id="btn-google" type="button"><i class="fa-brands fa-google"></i> Continue with Google</button>
                 <p>Dont have an Account? <a href="#" id="create-account">Create one</a></p>
                 <p>Forgot Password? <a id="reset-pass">Reset</a></p>
             </form>
@@ -48,7 +48,7 @@ const renderSignUp = () => {
                         placeholder="Email Address"/>
                 <input type="password" id="password"
                         placeholder="Password"/>
-                <button id="formButton">Continue</button>
+                <button id="formButton" type="button">Continue</button>
                 <p>Forgot Password? <a id="reset-pass">Reset</a></p>
             </form>
             <a href="#" class="go-back"><i class="fa-solid fa-chevron-left"></i></a>
@@ -73,7 +73,7 @@ const renderResetPass = () => {
             <form class="reset-password-form">
                 <input type="email" id="email-reset-pass"
                         placeholder="Enter Email Address"/>
-                <button id="reset-form">Continue</button>
+                <button id="reset-form" type="button">Continue</button>
             </form>
             <a href="#" class="go-back"><i class="fa-solid fa-chevron-left"></i></a>
         </div>
@@ -273,9 +273,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const user = auth.currentUser;
 const provider = new GoogleAuthProvider();
-if (user){
-    console.log(user)
-}
 
 const signGoogle = () => {
     signInWithPopup(auth, provider)
