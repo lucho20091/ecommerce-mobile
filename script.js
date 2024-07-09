@@ -1,18 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles/style.css">
-    <title>Ecommerce :D</title>
-</head>
-<body>
-    <div class="container" id="container">
-        <!-- Inicio -->
-        <!-- <img class="container-img" src="assets/Rectangle 13.png" /> -->
+const container = document.getElementById('container');
+let state = "start"
+// rendering HTML
+const renderStart = () => {
+    container.style.backgroundColor = '#8E6CEF'
+    container.innerHTML = `
+    <img class="container-img" src="assets/Rectangle 13.png" /> 
+    `
+}
 
-        <!-- Sign in -->
-         <!-- <div class="sign-in">
+const renderSignIn = () => {
+    state = "signIn"
+    container.style.backgroundColor = '#FFF'
+    container.innerHTML = `
+    <div class="sign-in">
             <h1>Sign in</h1>
             <form class="sign-in-form">
                 <input type="email"
@@ -22,12 +22,22 @@
                         placeholder="Password"
                         id="password-sign-in"/>
                 <button id="btn-sign-in">Continue</button>
-                <p>Dont have an Account? <a href="#">Create one</a></p>
+                <button id="btn-google"><i class="fa-brands fa-google"></i> Continue with Google</button>
+                <p>Dont have an Account? <a href="#" id="create-account">Create one</a></p>
+                <p>Forgot Password? <a id="reset-pass">Reset</a></p>
             </form>
-         </div> -->
+    </div> 
+    `
+    document.querySelector("#reset-pass").addEventListener("click", renderResetPass)
+    document.getElementById("create-account").addEventListener("click", renderSignUp)
+    document.querySelector("#btn-google").addEventListener("click", signGoogle)
+    document.getElementById("btn-sign-in").addEventListener("click", signInEmailPass)
+}
 
-         <!-- Create Account -->
-         <!-- <div class="create-account">
+const renderSignUp = () => {
+    state = "signUp"
+    container.innerHTML = `
+    <div class="create-account">
             <h1>Create Account</h1>
             <form class="create-account-form">
                 <input type="text" id="firstName"
@@ -39,27 +49,48 @@
                 <input type="password" id="password"
                         placeholder="Password"/>
                 <button id="formButton">Continue</button>
-                <p>Forgot Password? <a href="#">Reset</a></p>
+                <p>Forgot Password? <a id="reset-pass">Reset</a></p>
             </form>
             <a href="#" class="go-back"><i class="fa-solid fa-chevron-left"></i></a>
-         </div> -->
+    </div>
+    `
 
-         <!-- Reset Password -->
-         <!-- <div class="reset-password-account">
+    document.querySelector(".go-back").addEventListener("click", renderSignIn)
+    document.querySelector("#reset-pass").addEventListener("click", renderResetPass)
+    document.querySelector("#formButton").addEventListener("click", () => {
+        signUpEmailPass()
+        const firstName = document.getElementById('firstName').value
+        const lastName = document.getElementById('lastName').value
+        localStorage.setItem('fullName', `${firstName} ${lastName}`)
+    })
+    }
+
+
+const renderResetPass = () => {
+    container.innerHTML = `
+        <div class="reset-password-account">
             <h1>Forgot Password</h1>
             <form class="reset-password-form">
-                <input type="email" id="email"
+                <input type="email" id="email-reset-pass"
                         placeholder="Enter Email Address"/>
                 <button id="reset-form">Continue</button>
             </form>
             <a href="#" class="go-back"><i class="fa-solid fa-chevron-left"></i></a>
-         </div> -->
+        </div>
+    `
+    // const newEl = document.createElement('input')
+    // document.querySelector('.reset-password-form').appendChild(newEl)
+    document.querySelector(".go-back").addEventListener("click", renderSignIn)
+    document.querySelector('#reset-form').addEventListener("click", resetPassword)
+}
 
-         <!-- Homepage -->
-        <!-- <div class="homepage">
+const renderHomePage = (user) => {
+    container.style.backgroundColor = "#FFF"
+    container.innerHTML = `
+        <div class="homepage">
             <div class="top">
-                <div class="profile">
-                    <img src="./assets/avatar.png" alt="">
+                <div class="profile" id="div-profile">
+                    <img src=${user.photoURL || "./assets/avatar.png"} alt="">
                 </div>
                 <div class="category">
                     <select name="category" id="category">
@@ -138,19 +169,25 @@
                 <button> <img src="./assets/menu/home2.png" alt=""></button>
                 <button> <img src="./assets/menu/notifications.png" alt=""></button>
                 <button> <img src="./assets/menu/orders.png" alt=""></button>
-                <button> <img src="./assets/menu/profile.png" alt=""></button>
+                <button id="btn-profile"> <img src="./assets/menu/profile.png" alt=""></button>
             </div>
-        </div> -->
+            
+        </div>
+    `
+    document.querySelector('#btn-profile').addEventListener('click', () => renderProfile(user))
+    document.querySelector('#div-profile').addEventListener('click', () => renderProfile(user))
+}
 
-    <!-- Profile -->
-    <!-- <div class="profile">
+const renderProfile = (user) =>{
+    container.innerHTML = `
+      <div class="profile-page">
             <div class="top">
-                <img src="./assets/avatar.png" alt="">
+                <img src=${user.photoURL || "./assets/avatar.png"} alt="">
                 <div class="personal-info">
                     <div class="personal-info-text">
-                        <p class="name">Gilbert Jones</p>
-                        <p>Gilbertjones001@gmail.com</p>
-                        <p>121-224-7890</p>
+                        <p class="name">${user.displayName}</p>
+                        <p>${user.email}</p>
+                        <p>${user.phoneNumber || "123-456-7890"}</p>
                     </div>
                     <div class="personal-info-edit" >
                         <button id="btn-edit">Edit</button>
@@ -191,17 +228,110 @@
                 <button id="sign-out">Sign Out</button>
             </div>
             <div class="menu">
-                <button> <img src="./assets/menu/home2.png" alt=""></button>
-                <button> <img src="./assets/menu/notifications.png" alt=""></button>
-                <button> <img src="./assets/menu/orders.png" alt=""></button>
-                <button> <img src="./assets/menu/profile.png" alt=""></button>
+                <button id="btn-home"> <img src="./assets/menu/home2.png" alt=""></button>
+                <button id="btn-notification"> <img src="./assets/menu/notifications.png" alt=""></button>
+                <button id="btn-order"> <img src="./assets/menu/orders.png" alt=""></button>
+                <button id="btn-profile"> <img src="./assets/menu/profile.png" alt=""></button>
             </div>
         </div>
+    `
+    document.querySelector('#btn-home').addEventListener('click', () => renderHomePage(user))
+    document.querySelector('#sign-out').addEventListener('click', signOutUser)
 
-    <div class="line"></div> -->
-    </div>
+}
+
+const renderHTML = (parameter, user) => {
+    if (parameter === "Start"){
+        renderStart()
+        setTimeout(() => renderHomePage(user), 2000)
+    }
+}
+
+
+// Logic
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js'
+import {    getAuth, 
+            GoogleAuthProvider,
+            signInWithPopup,
+            onAuthStateChanged,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            sendPasswordResetEmail,
+            signOut       } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js'
+
     
-    <script src="https://kit.fontawesome.com/183ef109bd.js" crossorigin="anonymous"></script>
-    <script src="script.js" type="module"></script>
-</body>
-</html>
+const firebaseConfig = {
+    apiKey: "AIzaSyAaLko1DdrpabLvYw9KX6qWKk0NT9OfOME",
+    authDomain: "auth-f17b1.firebaseapp.com",
+    projectId: "auth-f17b1",
+    storageBucket: "auth-f17b1.appspot.com",
+    messagingSenderId: "718814302299",
+    appId: "1:718814302299:web:8cdc6021b35c7eeee1af7e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const user = auth.currentUser;
+const provider = new GoogleAuthProvider();
+if (user){
+    console.log(user)
+}
+
+const signGoogle = () => {
+    signInWithPopup(auth, provider)
+    .then((result) => {
+    }).catch((error) => {
+    console.error(error.message)
+});
+}
+
+const signUpEmailPass = () => {
+const email = document.getElementById('email').value
+const password = document.getElementById('password').value
+createUserWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    console.log(userCredential)
+  })
+  .catch((error) => {
+    console.error(error.message)
+  });
+}
+
+const signInEmailPass = () => {
+    const email = document.getElementById('email-sign-in').value
+    const password = document.getElementById('password-sign-in').value
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        console.log(userCredential)
+    })
+    .catch((error) => {
+        console.error(error.message)
+    });
+}
+
+const resetPassword = () => {
+    const email = document.getElementById('email-reset-pass').value
+    sendPasswordResetEmail(auth, email)
+  .then((user) => {
+    console.log(user)
+  })
+  .catch((error) => {
+    console.error(error.message)
+  });
+}
+
+const signOutUser = () => {
+    signOut(auth).then(() => {
+      }).catch((error) => {
+        console.error(error.message)
+      });
+}
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log(user)
+        renderHTML("Start", user)
+    } else {
+        renderSignIn()
+    }
+});
