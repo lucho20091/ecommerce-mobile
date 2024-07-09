@@ -326,7 +326,7 @@ const signOutUser = () => {
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log(user)
+        // console.log(user)
         renderHTML("Start", user)
     } else {
         renderSignIn()
