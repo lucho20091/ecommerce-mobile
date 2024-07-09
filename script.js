@@ -236,8 +236,30 @@ const renderProfile = (user) =>{
         </div>
     `
     document.querySelector('#btn-home').addEventListener('click', () => renderHomePage(user))
+    document.querySelector('#btn-edit').addEventListener('click', () => renderUpdateModal(user))
     document.querySelector('#sign-out').addEventListener('click', signOutUser)
 
+}
+
+const renderUpdateModal = (user) => {
+    container.innerHTML += `
+    <div class="modal">
+        <form class="modal-form">
+            <label for="update-image" id="label-update-profile">Update Profile Picture</label>
+            <input id="update-image" type="file">
+            <input type="text" id="update-name" placeholder="New Name" name="update-name" value=${user.displayName}>
+            <input type="number" id="update-number" placeholder="New Phone Number" name="update-number" value=${user.phoneNumber}>
+            <button type="button" id="update-user-info">Update</button>
+            <div class="close-update">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+        </form>
+    </div>`
+    const updateNameEl = document.getElementById('update-name');
+    const updateNumberEl = document.getElementById('update-number');
+    document.querySelector('.close-update').addEventListener('click', () => renderProfile(user))
+    document.querySelector('#update-user-info').addEventListener('click', () => console.log(updateNameEl.value))
+    
 }
 
 const renderHTML = (parameter, user) => {
