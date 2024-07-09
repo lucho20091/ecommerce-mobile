@@ -58,10 +58,10 @@ const renderSignUp = () => {
     document.querySelector(".go-back").addEventListener("click", renderSignIn)
     document.querySelector("#reset-pass").addEventListener("click", renderResetPass)
     document.querySelector("#formButton").addEventListener("click", () => {
-        signUpEmailPass()
         const firstName = document.getElementById('firstName').value
         const lastName = document.getElementById('lastName').value
-        localStorage.setItem('fullName', `${firstName} ${lastName}`)
+        const fullName = `${firstName} ${lastName}`
+        signUpEmailPass(fullName)
     })
     }
 
@@ -257,7 +257,8 @@ import {    getAuth,
             createUserWithEmailAndPassword,
             signInWithEmailAndPassword,
             sendPasswordResetEmail,
-            signOut       } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js'
+            signOut,
+            updateProfile        } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js'
 
     
 const firebaseConfig = {
@@ -282,11 +283,12 @@ const signGoogle = () => {
 });
 }
 
-const signUpEmailPass = () => {
+const signUpEmailPass = (name) => {
 const email = document.getElementById('email').value
 const password = document.getElementById('password').value
 createUserWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
+    setUserName(name)
     // console.log(userCredential)
   })
   .catch((error) => {
@@ -322,6 +324,19 @@ const signOutUser = () => {
       }).catch((error) => {
         console.error(error.message)
       });
+}
+
+function setUserName(name) {
+    updateProfile(auth.currentUser, {
+        displayName: name
+      }).then(() => {
+      }).catch((error) => {
+      });
+      
+}
+
+const updateUserInfo = () => {
+
 }
 
 onAuthStateChanged(auth, (user) => {
