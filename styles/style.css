@@ -333,3 +333,83 @@ a{
     width: fit-content;
     margin: 10px auto 0;
 }
+/* Modal */
+.modal{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    width: 86%;
+    background-color: #FFF;
+    /* border: 1px solid black; */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.377);
+
+}
+#update-image{
+    display: none;
+}
+#label-update-profile{
+    margin: 16px auto 0 16px;
+    display: inline-block;
+    width: 80%;
+    height: 56px;
+    border: none;
+    background: #F4F4F4;
+    border-radius: 4px;
+    font-size: 1rem;
+    padding: 18px 12px;
+    cursor: pointer;
+}
+.close-update{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    color: rgb(88, 8, 8);
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.356);
+    cursor: pointer;
+}
+.modal-form{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+}
+.modal-form > button{
+    background: #8E6CEF;
+    width: 80%;
+    margin: 0 auto 16px 16px;
+    height: 49px;
+    color: white;
+    border: none;
+    padding: 11px 0;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-form > input{
+    display: block;
+    width: 80%;
+    margin: 0 auto 0 16px;
+    height: 56px;
+    border: none;
+    background: #F4F4F4;
+    border-radius: 4px;
+    font-size: 1rem;
+    padding: 18px 12px;
+}
