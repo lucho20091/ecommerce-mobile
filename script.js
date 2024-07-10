@@ -1,5 +1,6 @@
 const container = document.getElementById('container');
 let state = "start"
+let urlPhoto
 // rendering HTML
 const renderStart = () => {
     container.style.backgroundColor = '#8E6CEF'
@@ -246,20 +247,33 @@ const renderUpdateModal = (user) => {
     <div class="modal">
         <form class="modal-form">
             <label for="update-image" id="label-update-profile">Update Profile Picture</label>
-            <input id="update-image" type="file">
-            <input type="text" id="update-name" placeholder="New Name" name="update-name" value=${user.displayName}>
-            <input type="number" id="update-number" placeholder="New Phone Number" name="update-number" value=${user.phoneNumber}>
+            <input id="update-image" accept="image/*" type="file">
+            <input type="text" id="update-name" placeholder="New Name" name="update-name">
             <button type="button" id="update-user-info">Update</button>
             <div class="close-update">
                 <i class="fa-solid fa-xmark"></i>
             </div>
         </form>
     </div>`
+    let file
     const updateNameEl = document.getElementById('update-name');
-    const updateNumberEl = document.getElementById('update-number');
+    document.getElementById('update-image').addEventListener('change', (event) => {
+        file = event.target.files[0]
+        uploadImg(file)
+        getPhotoURL(file)
+    });
     document.querySelector('.close-update').addEventListener('click', () => renderProfile(user))
-    document.querySelector('#update-user-info').addEventListener('click', () => console.log(updateNameEl.value))
-    
+    document.querySelector('#update-user-info').addEventListener('click', () => {
+        setTimeout(() => {
+                const obj = {
+                    displayName: updateNameEl.value,
+                    photoURL: urlPhoto
+                }
+                updateUserInfo(obj)
+        },2000)
+
+    })
+    // updateUserInfo(updateNameEl, updateNumberEl)
 }
 
 const renderHTML = (parameter, user) => {
@@ -282,6 +296,11 @@ import {    getAuth,
             signOut,
             updateProfile        } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js'
 
+import {    getStorage,
+            ref,
+            uploadBytesResumable,
+            getDownloadURL                   } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js';
+
     
 const firebaseConfig = {
     apiKey: "AIzaSyAaLko1DdrpabLvYw9KX6qWKk0NT9OfOME",
@@ -296,6 +315,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const user = auth.currentUser;
 const provider = new GoogleAuthProvider();
+const storage = getStorage(app);
+
+
+
 
 const signGoogle = () => {
     signInWithPopup(auth, provider)
@@ -357,15 +380,76 @@ function setUserName(name) {
       
 }
 
-const updateUserInfo = () => {
-
+const updateUserInfo = (obj) => {
+    updateProfile(auth.currentUser, {
+        displayName: obj.displayName || auth.currentUser.displayName,
+        photoURL: obj.photoURL || auth.currentUser.photoURL
+    }).then(() => {
+        console.log("changed successfully")
+        renderProfile(auth.currentUser)
+      })
+      .catch((error) => {
+        console.error(error.message)
+      });
 }
+
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // console.log(user)
         renderHTML("Start", user)
     } else {
         renderSignIn()
     }
 });
+
+// storage
+const uploadImg = async (file) => {
+    const storageRef = ref(storage, file.name)
+    uploadBytesResumable(storageRef, file)
+    .then((snapshot) => {
+      });
+    }
+
+const getPhotoURL = (file) => {
+    getDownloadURL(ref(storage, file.name))
+    .then((url) => {
+        urlPhoto = url
+    })
+    .catch((error) => {
+      console.error(error.message)
+    });
+}
+
+// Fetch data API
+async function getMenData(){
+    try{
+        const response = await fetch(`https://fakestoreapi.com/products/category/men's clothing`)
+        const json = await response.json();
+        return json
+    }
+    catch(error){
+        console.error(error.message)
+    }
+}
+
+async function getWomenData(){
+    try{
+        const response = await fetch(`https://fakestoreapi.com/products/category/women's clothing`)
+        const json = await response.json();
+        return json
+    } catch(error){
+        console.error(error.message)
+    }
+}
+
+
+async function allData() {
+try{
+    const menCloth = await getMenData()
+    const womenCloth = await getWomenData()
+    console.log(menCloth, womenCloth)
+}catch(e){
+    console.log(e)
+}
+}
+allData()
