@@ -154,7 +154,7 @@ const renderProducts = (arr) => {
                                 <p>$${item.price}</p>
                             </div>
         `
-    })
+    }).join("")
 }
 
 const renderProfile = (user) =>{
@@ -220,7 +220,7 @@ const renderProfile = (user) =>{
 
 }
 
-const renderUpdateModal = (user) => {
+const renderUpdateModal =  (user) => {
     container.innerHTML += `
     <div class="modal">
         <form class="modal-form">
@@ -234,15 +234,34 @@ const renderUpdateModal = (user) => {
         </form>
     </div>`
     let file
+    const btnUpdate = document.querySelector('#update-user-info')
     const updateNameEl = document.getElementById('update-name');
-    document.getElementById('update-image').addEventListener('change', (event) => {
+    document.getElementById('update-image').addEventListener('change', async (event) => {
+        btnUpdate.classList.add('disabled')
+        btnUpdate.disabled = true
+        console.log(btnUpdate)
         file = event.target.files[0]
-        uploadImg(file)
-        getPhotoURL(file)
+        if (file) {
+            try {
+                await uploadImg(file);
+                setTimeout(() => getPhotoURL(file),3000);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                btnUpdate.classList.remove('disabled');
+                btnUpdate.disabled = false;
+            }
+        } else {
+            console.warn('No file selected.');
+            btnUpdate.classList.remove('disabled');
+            btnUpdate.disabled = false;
+        }
+        console.log(btnUpdate)
     });
     document.querySelector('.close-update').addEventListener('click', () => renderProfile(user))
     document.querySelector('#update-user-info').addEventListener('click', () => {
         setTimeout(() => {
+                console.log(urlPhoto)
                 const obj = {
                     displayName: updateNameEl.value,
                     photoURL: urlPhoto
@@ -381,21 +400,23 @@ onAuthStateChanged(auth, (user) => {
 
 // storage
 const uploadImg = async (file) => {
+
     const storageRef = ref(storage, file.name)
     uploadBytesResumable(storageRef, file)
     .then((snapshot) => {
       });
     }
 
-const getPhotoURL = (file) => {
-    getDownloadURL(ref(storage, file.name))
-    .then((url) => {
+const getPhotoURL = async (file) => {
+    try{
+        const url = await getDownloadURL(ref(storage, file.name))
         urlPhoto = url
-    })
-    .catch((error) => {
+        
+    }catch(error) {
       console.error(error.message)
-    });
+    };
 }
+
 
 // Fetch data API
 async function getMenData(){

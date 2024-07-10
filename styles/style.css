@@ -419,3 +419,7 @@ a{
     font-size: 1rem;
     padding: 18px 12px;
 }
+#update-user-info:disabled{
+    background-color: gray;
+    cursor: wait;
+}
