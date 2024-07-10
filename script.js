@@ -1,5 +1,6 @@
 const container = document.getElementById('container');
 let state = "start"
+let urlPhoto
 // rendering HTML
 const renderStart = () => {
     container.style.backgroundColor = '#8E6CEF'
@@ -84,7 +85,8 @@ const renderResetPass = () => {
     document.querySelector('#reset-form').addEventListener("click", resetPassword)
 }
 
-const renderHomePage = (user) => {
+const renderHomePage = (user, obj) => {
+    console.log(obj)
     container.style.backgroundColor = "#FFF"
     container.innerHTML = `
         <div class="homepage">
@@ -117,50 +119,14 @@ const renderHomePage = (user) => {
                     <div class="top-selling">
                         <h2>Top Selling</h2>
                         <div class="items">
-                            <div class="card">
-                                <img src="./assets/harrington jacket.png" alt="">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>Mens Harrington Jacket</p>
-                                <p>$148.00</p>
-                            </div>
-                            <div class="card">
-                                <img src="./assets/cirro mens slides.png" alt="">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>Mens Harrington Jacket</p>
-                                <p>$55</p>
-                                <span>$100.97</span>
-                            </div>
-                            <div class="card">
-                                <img src="./assets/harrington jacket.png" alt="">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>Mens Harrington Jacket</p>
-                                <p>$148.00</p>
-                            </div>
+                        ${renderProducts(obj.menCloth)}
                         </div>
                     </div>
 
                     <div class="new-selling">
                         <h2>New in Selling</h2>
                         <div class="items">
-                            <div class="card">
-                                <img src="./assets/harrington jacket.png" alt="">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>Mens Harrington Jacket</p>
-                                <p>$148.00</p>
-                            </div>
-                            <div class="card">
-                                <img src="./assets/cirro mens slides.png" alt="">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>Mens Harrington Jacket</p>
-                                <p>$55</p>
-                                <span>$100.97</span>
-                            </div>
-                            <div class="card">
-                                <img src="./assets/harrington jacket.png" alt="">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>Mens Harrington Jacket</p>
-                                <p>$148.00</p>
-                            </div>
+                         ${renderProducts(obj.womenCloth)}
                         </div>
                     </div>
                 </div>
@@ -176,6 +142,19 @@ const renderHomePage = (user) => {
     `
     document.querySelector('#btn-profile').addEventListener('click', () => renderProfile(user))
     document.querySelector('#div-profile').addEventListener('click', () => renderProfile(user))
+}
+
+const renderProducts = (arr) => {
+    return arr.map(item => {
+        return `
+                            <div class="card">
+                                <img src=${item.image} alt="">
+                                <i class="fa-regular fa-heart"></i>
+                                <p>${item.title}</p>
+                                <p>$${item.price}</p>
+                            </div>
+        `
+    })
 }
 
 const renderProfile = (user) =>{
@@ -236,14 +215,49 @@ const renderProfile = (user) =>{
         </div>
     `
     document.querySelector('#btn-home').addEventListener('click', () => renderHomePage(user))
+    document.querySelector('#btn-edit').addEventListener('click', () => renderUpdateModal(user))
     document.querySelector('#sign-out').addEventListener('click', signOutUser)
 
 }
 
-const renderHTML = (parameter, user) => {
+const renderUpdateModal = (user) => {
+    container.innerHTML += `
+    <div class="modal">
+        <form class="modal-form">
+            <label for="update-image" id="label-update-profile">Update Profile Picture</label>
+            <input id="update-image" accept="image/*" type="file">
+            <input type="text" id="update-name" placeholder="New Name" name="update-name">
+            <button type="button" id="update-user-info">Update</button>
+            <div class="close-update">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+        </form>
+    </div>`
+    let file
+    const updateNameEl = document.getElementById('update-name');
+    document.getElementById('update-image').addEventListener('change', (event) => {
+        file = event.target.files[0]
+        uploadImg(file)
+        getPhotoURL(file)
+    });
+    document.querySelector('.close-update').addEventListener('click', () => renderProfile(user))
+    document.querySelector('#update-user-info').addEventListener('click', () => {
+        setTimeout(() => {
+                const obj = {
+                    displayName: updateNameEl.value,
+                    photoURL: urlPhoto
+                }
+                updateUserInfo(obj)
+        },2000)
+
+    })
+    // updateUserInfo(updateNameEl, updateNumberEl)
+}
+
+const renderHTML = (parameter, user, obj) => {
     if (parameter === "Start"){
         renderStart()
-        setTimeout(() => renderHomePage(user), 2000)
+        setTimeout(() => renderHomePage(user, obj), 2000)
     }
 }
 
@@ -260,6 +274,11 @@ import {    getAuth,
             signOut,
             updateProfile        } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js'
 
+import {    getStorage,
+            ref,
+            uploadBytesResumable,
+            getDownloadURL                   } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js';
+
     
 const firebaseConfig = {
     apiKey: "AIzaSyAaLko1DdrpabLvYw9KX6qWKk0NT9OfOME",
@@ -274,6 +293,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const user = auth.currentUser;
 const provider = new GoogleAuthProvider();
+const storage = getStorage(app);
+
+
+
 
 const signGoogle = () => {
     signInWithPopup(auth, provider)
@@ -335,15 +358,82 @@ function setUserName(name) {
       
 }
 
-const updateUserInfo = () => {
-
+const updateUserInfo = (obj) => {
+    updateProfile(auth.currentUser, {
+        displayName: obj.displayName || auth.currentUser.displayName,
+        photoURL: obj.photoURL || auth.currentUser.photoURL
+    }).then(() => {
+        console.log("changed successfully")
+        renderProfile(auth.currentUser)
+      })
+      .catch((error) => {
+        console.error(error.message)
+      });
 }
+
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // console.log(user)
-        renderHTML("Start", user)
+        allData()
+       
     } else {
         renderSignIn()
     }
 });
+
+// storage
+const uploadImg = async (file) => {
+    const storageRef = ref(storage, file.name)
+    uploadBytesResumable(storageRef, file)
+    .then((snapshot) => {
+      });
+    }
+
+const getPhotoURL = (file) => {
+    getDownloadURL(ref(storage, file.name))
+    .then((url) => {
+        urlPhoto = url
+    })
+    .catch((error) => {
+      console.error(error.message)
+    });
+}
+
+// Fetch data API
+async function getMenData(){
+    try{
+        const response = await fetch(`https://fakestoreapi.com/products/category/men's clothing`)
+        const json = await response.json();
+        return json
+    }
+    catch(error){
+        console.error(error.message)
+    }
+}
+
+async function getWomenData(){
+    try{
+        const response = await fetch(`https://fakestoreapi.com/products/category/women's clothing`)
+        const json = await response.json();
+        return json
+    } catch(error){
+        console.error(error.message)
+    }
+}
+
+
+async function allData() {
+try{
+    renderStart()
+    const menCloth = await getMenData()
+    const womenCloth = await getWomenData()
+    const obj = {
+        menCloth,
+        womenCloth
+    }
+    renderHTML("Start", auth.currentUser, obj)
+    console.log(menCloth, womenCloth)
+}catch(e){
+    console.log(e)
+}
+}
