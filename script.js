@@ -1,6 +1,7 @@
 const container = document.getElementById('container');
 let state = "start"
 let urlPhoto
+let myObj = JSON.parse(localStorage.getItem("obj")) || null
 // rendering HTML
 const renderStart = () => {
     container.style.backgroundColor = '#8E6CEF'
@@ -86,7 +87,6 @@ const renderResetPass = () => {
 }
 
 const renderHomePage = (user, obj) => {
-    console.log(obj)
     container.style.backgroundColor = "#FFF"
     container.innerHTML = `
         <div class="homepage">
@@ -214,7 +214,7 @@ const renderProfile = (user) =>{
             </div>
         </div>
     `
-    document.querySelector('#btn-home').addEventListener('click', () => renderHomePage(user))
+    document.querySelector('#btn-home').addEventListener('click', () => renderHomePage(user, myObj))
     document.querySelector('#btn-edit').addEventListener('click', () => renderUpdateModal(user))
     document.querySelector('#sign-out').addEventListener('click', signOutUser)
 
@@ -249,9 +249,7 @@ const renderUpdateModal = (user) => {
                 }
                 updateUserInfo(obj)
         },2000)
-
     })
-    // updateUserInfo(updateNameEl, updateNumberEl)
 }
 
 const renderHTML = (parameter, user, obj) => {
@@ -431,8 +429,8 @@ try{
         menCloth,
         womenCloth
     }
+    localStorage.setItem('obj', JSON.stringify(obj))
     renderHTML("Start", auth.currentUser, obj)
-    console.log(menCloth, womenCloth)
 }catch(e){
     console.log(e)
 }
