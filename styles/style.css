@@ -239,6 +239,12 @@ a{
 .card{
     position: relative;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.288);
+    padding: 10px;
+}
+.card > img{
+    width: 159px;
+    height: 220px;  
+    object-fit: cover;
 
 }
 .fa-heart{
